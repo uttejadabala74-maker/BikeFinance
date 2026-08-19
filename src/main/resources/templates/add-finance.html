@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Create Finance Account - Sri Sai Teja Finance</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+</head>
+<body>
+
+<div class="app-container">
+    <aside class="sidebar" id="sidebar">
+        <div class="sidebar-header">
+            <div class="sidebar-brand-title">🏍️ Sri Sai Teja</div>
+            <div class="sidebar-brand-subtitle">Finance & Auto Consultancy</div>
+        </div>
+        <nav class="sidebar-nav">
+            <a href="/" class="nav-item"><span class="nav-icon">📊</span> Dashboard</a>
+            <a href="/bikes" class="nav-item"><span class="nav-icon">🛵</span> Bikes Register</a>
+            <a href="/customers" class="nav-item"><span class="nav-icon">👥</span> Customers</a>
+            <a href="/finance" class="nav-item active"><span class="nav-icon">💰</span> Finance Accounts</a>
+            <a href="/emis" class="nav-item"><span class="nav-icon">📅</span> EMI Schedule</a>
+            <a href="/payments" class="nav-item"><span class="nav-icon">💵</span> Payments</a>
+            <a href="/challans" class="nav-item"><span class="nav-icon">📜</span> Challans</a>
+            <a href="/reports" class="nav-item"><span class="nav-icon">📈</span> Reports</a>
+            <a href="/settings" class="nav-item"><span class="nav-icon">⚙️</span> Settings</a>
+        </nav>
+    </aside>
+
+    <div class="main-wrapper">
+        <header class="top-header">
+            <button class="mobile-toggle" onclick="document.getElementById('sidebar').classList.toggle('open')">☰</button>
+            <div class="header-actions">
+                <div class="business-badge"><span>🏢</span> Sri Sai Teja Finance</div>
+            </div>
+        </header>
+
+        <main class="content-area">
+            <div class="page-header">
+                <div>
+                    <h1 class="page-title">New Finance Account</h1>
+                    <p class="page-subtitle">Configure finance terms, agreement charges, interest rate and EMI schedule</p>
+                </div>
+                <a href="/finance" class="btn btn-outline">⬅️ Back to Finance</a>
+            </div>
+
+            <div style="display: grid; grid-template-columns: 1fr 380px; gap: 24px;">
+                <!-- Left Column: Form -->
+                <div class="card">
+                    <form th:action="@{/finance/save}" th:object="${account}" method="post" id="financeForm">
+                        <div class="form-grid">
+                            <div class="form-group">
+                                <label>Finance Company *</label>
+                                <input type="text" th:field="*{financeCompany}" class="form-control" placeholder="e.g. Sri Sai Teja Finance, Bajaj Finance" required>
+                            </div>
+                            <div class="form-group">
+                                <label>Loan Account Number</label>
+                                <input type="text" th:field="*{loanAccountNumber}" class="form-control" placeholder="Auto / Loan Acc #">
+                            </div>
+                            <div class="form-group">
+                                <label>Select Customer *</label>
+                                <select name="customerId" id="customerId" class="form-control" required>
+                                    <option value="">-- Choose Customer --</option>
+                                    <option th:each="c : ${customers}" th:value="${c.customerId}" th:text="${c.name + ' (' + c.phone + ')'}" th:selected="${account.customer != null and account.customer.customerId == c.customerId}"></option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label>Select Bike *</label>
+                                <select name="bikeId" id="bikeId" class="form-control" required onchange="onBikeSelect(this)">
+                                    <option value="">-- Choose Bike --</option>
+                                    <option th:each="b : ${bikes}" th:value="${b.bikeId}" th:data-price="${b.bikeActualPrice}" th:text="${b.company + ' ' + b.model + ' (' + (b.registrationNumber != null ? b.registrationNumber : 'No Reg') + ')'}" th:selected="${account.bike != null and account.bike.bikeId == b.bikeId}"></option>
+                                </select>
+                            </div>
+
+                            <div class="form-group">
+                                <label>Bike Actual Price (₹) *</label>
+                                <input type="number" step="0.01" th:field="*{bikeActualPrice}" id="bikeActualPrice" class="form-control" placeholder="90000" required oninput="recalculate()">
+                            </div>
+                            <div class="form-group">
+                                <label>Less: Advance / Down Payment (₹)</label>
+                                <input type="number" step="0.01" th:field="*{downPayment}" id="downPayment" class="form-control" placeholder="20000" oninput="recalculate()">
+                            </div>
+                            <div class="form-group">
+                                <label>Add: Agreement Charges (₹)</label>
+                                <input type="number" step="0.01" th:field="*{agreementCharges}" id="agreementCharges" class="form-control" placeholder="4900" oninput="recalculate()">
+                            </div>
+                            <div class="form-group">
+                                <label>Add: Other Charges (₹)</label>
+                                <input type="number" step="0.01" th:field="*{otherCharges}" id="otherCharges" class="form-control" placeholder="600" oninput="recalculate()">
+                            </div>
+                            <div class="form-group">
+                                <label>Interest Rate (% per period) *</label>
+                                <input type="number" step="0.01" th:field="*{interestRate}" id="interestRate" class="form-control" placeholder="1.8" required oninput="recalculate()">
+                            </div>
+                            <div class="form-group">
+                                <label>Tenure (Months) *</label>
+                                <input type="number" th:field="*{tenure}" id="tenure" class="form-control" placeholder="10" required oninput="recalculate()">
+                            </div>
+                            <div class="form-group">
+                                <label>Number of EMIs *</label>
+                                <input type="number" th:field="*{numberOfEmis}" id="numberOfEmis" class="form-control" placeholder="10" required oninput="recalculate()">
+                            </div>
+                            <div class="form-group">
+                                <label>Finance Start Date *</label>
+                                <input type="date" th:field="*{financeStartDate}" class="form-control" required>
+                            </div>
+                            <div class="form-group">
+                                <label>First EMI Due Date *</label>
+                                <input type="date" th:field="*{firstEmiDate}" class="form-control" required>
+                            </div>
+                        </div>
+
+                        <div style="margin-top: 24px; display: flex; gap: 12px;">
+                            <button type="submit" class="btn btn-primary">💾 Generate EMI Schedule & Save Finance</button>
+                            <a href="/finance" class="btn btn-outline">Cancel</a>
+                        </div>
+                    </form>
+                </div>
+
+                <!-- Right Column: Live Dynamic Calculation Breakdown Widget (Section 26) -->
+                <div>
+                    <div class="calc-summary-card">
+                        <h3 style="font-size: 16px; font-weight: 800; border-bottom: 1px solid rgba(255,255,255,0.2); padding-bottom: 12px; margin-bottom: 16px; color: #ffffff;">
+                            ⚡ Live Financial Calculation
+                        </h3>
+
+                        <div class="calc-row">
+                            <span>Bike Actual Price:</span>
+                            <span id="lblActualPrice" style="font-weight: 700;">₹0.00</span>
+                        </div>
+                        <div class="calc-row">
+                            <span>Less: Down Payment:</span>
+                            <span id="lblDownPayment" style="color: #f87171;">- ₹0.00</span>
+                        </div>
+                        <div class="calc-row" style="font-weight: 700; color: #93c5fd;">
+                            <span>Balance Amount:</span>
+                            <span id="lblBalanceAmount">₹0.00</span>
+                        </div>
+                        <div class="calc-row">
+                            <span>Add: Agreement Charges:</span>
+                            <span id="lblAgreementCharges">+ ₹0.00</span>
+                        </div>
+                        <div class="calc-row">
+                            <span>Add: Other Charges:</span>
+                            <span id="lblOtherCharges">+ ₹0.00</span>
+                        </div>
+                        <div class="calc-row" style="font-weight: 800; font-size: 16px; color: #fbbf24; border-top: 1px dashed rgba(255,255,255,0.2); margin-top: 6px; padding-top: 10px;">
+                            <span>Finance Principal:</span>
+                            <span id="lblPrincipal">₹0.00</span>
+                        </div>
+                        <div class="calc-row">
+                            <span>Total Interest (<span id="lblRate">1.8%</span> × <span id="lblTenure">10m</span>):</span>
+                            <span id="lblInterest" style="color: #fca5a5;">₹0.00</span>
+                        </div>
+                        <div class="calc-row" style="font-weight: 800; font-size: 16px; color: #ffffff;">
+                            <span>Total Repayment:</span>
+                            <span id="lblTotalRepayment">₹0.00</span>
+                        </div>
+
+                        <div class="calc-row total">
+                            <div>
+                                <div style="font-size: 12px; color: #a7f3d0; text-transform: uppercase;">Auto-Calculated EMI</div>
+                                <div id="lblNumEmis" style="font-size: 11px; color: #94a3b8;">(10 Monthly EMIs)</div>
+                            </div>
+                            <span id="lblEmiAmount" style="font-size: 22px;">₹0 / mo</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+</div>
+
+<script>
+    function fmt(val) {
+        return '₹' + Number(val || 0).toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+    }
+
+    function onBikeSelect(sel) {
+        const opt = sel.options[sel.selectedIndex];
+        if (opt && opt.dataset.price) {
+            document.getElementById('bikeActualPrice').value = opt.dataset.price;
+            recalculate();
+        }
+    }
+
+    function recalculate() {
+        const actualPrice = parseFloat(document.getElementById('bikeActualPrice').value) || 0;
+        const downPayment = parseFloat(document.getElementById('downPayment').value) || 0;
+        const agreement = parseFloat(document.getElementById('agreementCharges').value) || 0;
+        const other = parseFloat(document.getElementById('otherCharges').value) || 0;
+        const rate = parseFloat(document.getElementById('interestRate').value) || 0;
+        const tenure = parseInt(document.getElementById('tenure').value) || 1;
+        const numEmis = parseInt(document.getElementById('numberOfEmis').value) || tenure;
+
+        const balance = Math.max(0, actualPrice - downPayment);
+        const principal = balance + agreement + other;
+        const totalInterest = principal * (rate / 100) * tenure;
+        const totalRepayment = principal + totalInterest;
+        const emiAmount = numEmis > 0 ? Math.round(totalRepayment / numEmis) : 0;
+
+        document.getElementById('lblActualPrice').innerText = fmt(actualPrice);
+        document.getElementById('lblDownPayment').innerText = '- ' + fmt(downPayment);
+        document.getElementById('lblBalanceAmount').innerText = fmt(balance);
+        document.getElementById('lblAgreementCharges').innerText = '+ ' + fmt(agreement);
+        document.getElementById('lblOtherCharges').innerText = '+ ' + fmt(other);
+        document.getElementById('lblPrincipal').innerText = fmt(principal);
+        document.getElementById('lblRate').innerText = rate + '%';
+        document.getElementById('lblTenure').innerText = tenure + 'm';
+        document.getElementById('lblInterest').innerText = fmt(totalInterest);
+        document.getElementById('lblTotalRepayment').innerText = fmt(totalRepayment);
+        document.getElementById('lblNumEmis').innerText = '(' + numEmis + ' Monthly EMIs)';
+        document.getElementById('lblEmiAmount').innerText = fmt(emiAmount) + ' / mo';
+    }
+
+    document.addEventListener('DOMContentLoaded', recalculate);
+</script>
+
+</body>
+</html>

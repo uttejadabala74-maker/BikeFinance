@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Traffic Challans - Sri Sai Teja Finance</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+</head>
+<body>
+
+<div class="app-container">
+    <aside class="sidebar" id="sidebar">
+        <div class="sidebar-header">
+            <div class="sidebar-brand-title">🏍️ Sri Sai Teja</div>
+            <div class="sidebar-brand-subtitle">Finance & Auto Consultancy</div>
+        </div>
+        <nav class="sidebar-nav">
+            <a href="/" class="nav-item"><span class="nav-icon">📊</span> Dashboard</a>
+            <a href="/bikes" class="nav-item"><span class="nav-icon">🛵</span> Bikes Register</a>
+            <a href="/customers" class="nav-item"><span class="nav-icon">👥</span> Customers</a>
+            <a href="/finance" class="nav-item"><span class="nav-icon">💰</span> Finance Accounts</a>
+            <a href="/emis" class="nav-item"><span class="nav-icon">📅</span> EMI Schedule</a>
+            <a href="/payments" class="nav-item"><span class="nav-icon">💵</span> Payments</a>
+            <a href="/challans" class="nav-item active"><span class="nav-icon">📜</span> Challans</a>
+            <a href="/reports" class="nav-item"><span class="nav-icon">📈</span> Reports</a>
+            <a href="/settings" class="nav-item"><span class="nav-icon">⚙️</span> Settings</a>
+        </nav>
+    </aside>
+
+    <div class="main-wrapper">
+        <header class="top-header">
+            <button class="mobile-toggle" onclick="document.getElementById('sidebar').classList.toggle('open')">☰</button>
+            <div class="header-actions">
+                <div class="business-badge"><span>🏢</span> Sri Sai Teja Finance</div>
+            </div>
+        </header>
+
+        <main class="content-area">
+            <div th:if="${successMessage}" class="alert alert-success" th:text="${successMessage}">Success!</div>
+            <div th:if="${errorMessage}" class="alert alert-danger" th:text="${errorMessage}">Error!</div>
+
+            <div class="page-header">
+                <div>
+                    <h1 class="page-title">Traffic & RTO Challans</h1>
+                    <p class="page-subtitle">Track police offences, fine amounts and clearance status per vehicle</p>
+                </div>
+                <a href="/challans/add" class="btn btn-primary">📜 Add New Challan</a>
+            </div>
+
+            <div class="card">
+                <div class="table-responsive">
+                    <table class="custom-table">
+                        <thead>
+                        <tr>
+                            <th>Challan #</th>
+                            <th>Bike (Reg #)</th>
+                            <th>Customer</th>
+                            <th>Offence Date</th>
+                            <th>Fine Amount</th>
+                            <th>Reason / Offence</th>
+                            <th>Location</th>
+                            <th>Status</th>
+                            <th>Action</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <tr th:if="${challans == null or #lists.isEmpty(challans)}">
+                            <td colspan="9" style="text-align: center; color: var(--text-muted);">No traffic challans logged.</td>
+                        </tr>
+                        <tr th:each="c : ${challans}">
+                            <td th:text="${c.challanNumber}" style="font-weight: 700;">CHAL-9988</td>
+                            <td>
+                                <a th:if="${c.bike != null}" th:href="@{/bikes/detail/{id}(id=${c.bike.bikeId})}" th:text="${c.registrationNumber != null ? c.registrationNumber : c.bike.registrationNumber}" style="color: var(--brand-primary); font-weight: 700; text-decoration: none;">AP 39 1234</a>
+                            </td>
+                            <td th:text="${c.customer != null ? c.customer.name : 'N/A'}">Sathya Krishna</td>
+                            <td th:text="${c.challanDate}">2026-08-01</td>
+                            <td th:text="${'₹' + #numbers.formatDecimal(c.amount, 1, 'COMMA', 2, 'POINT')}" style="font-weight: 700; color: var(--danger);">₹1,000</td>
+                            <td th:text="${c.reason}">No Helmet</td>
+                            <td th:text="${c.location != null ? c.location : 'N/A'}">Vijayawada</td>
+                            <td>
+                                <span class="badge" th:classappend="${c.status == 'Paid' ? 'badge-success' : (c.status == 'Disputed' ? 'badge-warning' : 'badge-danger')}" th:text="${c.status}">Pending</span>
+                            </td>
+                            <td>
+                                <form th:if="${c.status != 'Paid'}" th:action="@{/challans/update-status/{id}(id=${c.challanId})}" method="post" style="display: inline;">
+                                    <input type="hidden" name="status" value="Paid">
+                                    <button type="submit" class="btn btn-sm btn-success">Mark Paid</button>
+                                </form>
+                            </td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </main>
+    </div>
+</div>
+
+</body>
+</html>

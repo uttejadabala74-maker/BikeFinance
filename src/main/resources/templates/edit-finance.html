@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Edit Finance Account - Sri Sai Teja Finance</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+</head>
+<body>
+
+<div class="app-container">
+    <aside class="sidebar" id="sidebar">
+        <div class="sidebar-header">
+            <div class="sidebar-brand-title">🏍️ Sri Sai Teja</div>
+            <div class="sidebar-brand-subtitle">Finance & Auto Consultancy</div>
+        </div>
+        <nav class="sidebar-nav">
+            <a href="/" class="nav-item"><span class="nav-icon">📊</span> Dashboard</a>
+            <a href="/bikes" class="nav-item"><span class="nav-icon">🛵</span> Bikes Register</a>
+            <a href="/customers" class="nav-item"><span class="nav-icon">👥</span> Customers</a>
+            <a href="/finance" class="nav-item active"><span class="nav-icon">💰</span> Finance Accounts</a>
+            <a href="/emis" class="nav-item"><span class="nav-icon">📅</span> EMI Schedule</a>
+            <a href="/payments" class="nav-item"><span class="nav-icon">💵</span> Payments</a>
+            <a href="/challans" class="nav-item"><span class="nav-icon">📜</span> Challans</a>
+            <a href="/reports" class="nav-item"><span class="nav-icon">📈</span> Reports</a>
+            <a href="/settings" class="nav-item"><span class="nav-icon">⚙️</span> Settings</a>
+        </nav>
+    </aside>
+
+    <div class="main-wrapper">
+        <header class="top-header">
+            <button class="mobile-toggle" onclick="document.getElementById('sidebar').classList.toggle('open')">☰</button>
+            <div class="header-actions">
+                <div class="business-badge"><span>🏢</span> Sri Sai Teja Finance</div>
+            </div>
+        </header>
+
+        <main class="content-area">
+            <div class="page-header">
+                <div>
+                    <h1 class="page-title">Edit Finance Account</h1>
+                    <p class="page-subtitle" th:text="${'Finance ID: #FIN-' + account.financeId}">Finance ID: #FIN-1</p>
+                </div>
+                <a href="/finance" class="btn btn-outline">⬅️ Back to Finance</a>
+            </div>
+
+            <div class="card">
+                <form th:action="@{/finance/update}" th:object="${account}" method="post">
+                    <input type="hidden" th:field="*{financeId}">
+
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label>Loan Account Number</label>
+                            <input type="text" th:field="*{loanAccountNumber}" class="form-control">
+                        </div>
+                        <div class="form-group">
+                            <label>Finance Company</label>
+                            <input type="text" th:field="*{financeCompany}" class="form-control">
+                        </div>
+                        <div class="form-group">
+                            <label>Status</label>
+                            <select th:field="*{status}" class="form-control">
+                                <option value="Active">Active</option>
+                                <option value="Completed">Completed</option>
+                                <option value="Closed">Closed</option>
+                                <option value="Cancelled">Cancelled</option>
+                            </select>
+                        </div>
+                        <div class="form-group" style="grid-column: 1 / -1;">
+                            <label>Notes</label>
+                            <textarea th:field="*{notes}" class="form-control" rows="3"></textarea>
+                        </div>
+                    </div>
+
+                    <div style="margin-top: 24px; display: flex; gap: 12px;">
+                        <button type="submit" class="btn btn-primary">💾 Update Account</button>
+                        <a href="/finance" class="btn btn-outline">Cancel</a>
+                    </div>
+                </form>
+            </div>
+        </main>
+    </div>
+</div>
+
+</body>
+</html>

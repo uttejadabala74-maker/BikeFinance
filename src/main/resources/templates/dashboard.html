@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard - Sri Sai Teja Finance & Auto Consultancy</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+</head>
+<body>
+
+<div class="app-container">
+    <!-- Navigation Sidebar -->
+    <aside class="sidebar" id="sidebar">
+        <div class="sidebar-header">
+            <div class="sidebar-brand-title">🏍️ Sri Sai Teja</div>
+            <div class="sidebar-brand-subtitle">Finance & Auto Consultancy</div>
+        </div>
+        <nav class="sidebar-nav">
+            <a href="/" class="nav-item active"><span class="nav-icon">📊</span> Dashboard</a>
+            <a href="/bikes" class="nav-item"><span class="nav-icon">🛵</span> Bikes Register</a>
+            <a href="/customers" class="nav-item"><span class="nav-icon">👥</span> Customers</a>
+            <a href="/finance" class="nav-item"><span class="nav-icon">💰</span> Finance Accounts</a>
+            <a href="/emis" class="nav-item"><span class="nav-icon">📅</span> EMI Schedule</a>
+            <a href="/payments" class="nav-item"><span class="nav-icon">💵</span> Payments</a>
+            <a href="/challans" class="nav-item"><span class="nav-icon">📜</span> Challans</a>
+            <a href="/reports" class="nav-item"><span class="nav-icon">📈</span> Reports</a>
+            <a href="/settings" class="nav-item"><span class="nav-icon">⚙️</span> Settings</a>
+        </nav>
+    </aside>
+
+    <!-- Main Wrapper -->
+    <div class="main-wrapper">
+        <!-- Top Header -->
+        <header class="top-header">
+            <button class="mobile-toggle" onclick="document.getElementById('sidebar').classList.toggle('open')">☰</button>
+            <form action="/search" method="get" class="search-bar">
+                <span>🔍</span>
+                <input type="text" name="q" placeholder="Search reg no, customer, phone, chassis, loan #...">
+            </form>
+            <div class="header-actions">
+                <div class="business-badge">
+                    <span>🏢</span> Sri Sai Teja Finance
+                </div>
+            </div>
+        </header>
+
+        <!-- Content Area -->
+        <main class="content-area">
+            <div class="page-header">
+                <div>
+                    <h1 class="page-title">Executive Dashboard</h1>
+                    <p class="page-subtitle">Real-time business performance & collection overview</p>
+                </div>
+                <div style="display: flex; gap: 10px;">
+                    <a href="/finance/add" class="btn btn-primary">➕ New Finance Account</a>
+                    <a href="/payments/add" class="btn btn-success">💵 Record Payment</a>
+                </div>
+            </div>
+
+            <!-- 10 Database Metrics Cards -->
+            <div class="grid-cards">
+                <div class="stat-card">
+                    <div class="stat-header">Total Bikes <span class="stat-icon icon-blue">🛵</span></div>
+                    <div class="stat-value" th:text="${totalBikes}">0</div>
+                    <div class="stat-footer">Registered vehicles</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-header">Available Bikes <span class="stat-icon icon-green">✅</span></div>
+                    <div class="stat-value" th:text="${availableBikes}">0</div>
+                    <div class="stat-footer">Ready for sale</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-header">Financed Bikes <span class="stat-icon icon-purple">📄</span></div>
+                    <div class="stat-value" th:text="${financedBikes}">0</div>
+                    <div class="stat-footer">Active loans</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-header">Total Customers <span class="stat-icon icon-blue">👥</span></div>
+                    <div class="stat-value" th:text="${totalCustomers}">0</div>
+                    <div class="stat-footer">Registered clients</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-header">Active Loans <span class="stat-icon icon-blue">💼</span></div>
+                    <div class="stat-value" th:text="${activeFinance}">0</div>
+                    <div class="stat-footer">Ongoing finance accounts</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-header">Pending EMIs <span class="stat-icon icon-amber">⏳</span></div>
+                    <div class="stat-value" th:text="${pendingEmis}">0</div>
+                    <div class="stat-footer">Awaiting payment</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-header">Overdue EMIs <span class="stat-icon icon-red">⚠️</span></div>
+                    <div class="stat-value" style="color: var(--danger);" th:text="${overdueEmis}">0</div>
+                    <div class="stat-footer">Action required</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-header">Total Collected <span class="stat-icon icon-green">💰</span></div>
+                    <div class="stat-value" style="color: var(--success);" th:text="${'₹' + #numbers.formatDecimal(totalCollected, 1, 'COMMA', 2, 'POINT')}">₹0.00</div>
+                    <div class="stat-footer">All-time received</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-header">Total Outstanding <span class="stat-icon icon-red">📉</span></div>
+                    <div class="stat-value" style="color: var(--brand-primary);" th:text="${'₹' + #numbers.formatDecimal(totalOutstanding, 1, 'COMMA', 2, 'POINT')}">₹0.00</div>
+                    <div class="stat-footer">Pending collections</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-header">Total Challans <span class="stat-icon icon-amber">📜</span></div>
+                    <div class="stat-value" th:text="${totalChallans}">0</div>
+                    <div class="stat-footer">Traffic offences logged</div>
+                </div>
+            </div>
+
+            <!-- Overdue EMIs Alert Block -->
+            <div class="card" th:if="${overdueEmiList != null and !overdueEmiList.isEmpty()}" style="border-left: 5px solid var(--danger);">
+                <div class="card-title" style="color: var(--danger);">
+                    <span>⚠️ Immediate Overdue Action Required (<span th:text="${#lists.size(overdueEmiList)}">0</span>)</span>
+                    <a href="/emis?status=overdue" class="btn btn-sm btn-outline">View All Overdue</a>
+                </div>
+                <div class="table-responsive">
+                    <table class="custom-table">
+                        <thead>
+                        <tr>
+                            <th>EMI #</th>
+                            <th>Customer</th>
+                            <th>Phone</th>
+                            <th>Bike Reg #</th>
+                            <th>Due Date</th>
+                            <th>EMI Amount</th>
+                            <th>Remaining</th>
+                            <th>Action</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <tr th:each="emi : ${overdueEmiList}">
+                            <td th:text="${'EMI #' + emi.emiNumber}">EMI #1</td>
+                            <td th:text="${emi.customer != null ? emi.customer.name : 'N/A'}">Customer</td>
+                            <td th:text="${emi.customer != null ? emi.customer.phone : 'N/A'}">Phone</td>
+                            <td th:text="${emi.bike != null ? emi.bike.registrationNumber : 'N/A'}">AP 39 1234</td>
+                            <td th:text="${emi.dueDate}" style="color: var(--danger); font-weight: 700;">2026-08-01</td>
+                            <td th:text="${'₹' + #numbers.formatDecimal(emi.emiAmount, 1, 'COMMA', 2, 'POINT')}">₹8,909</td>
+                            <td th:text="${'₹' + #numbers.formatDecimal(emi.remainingAmount, 1, 'COMMA', 2, 'POINT')}">₹8,909</td>
+                            <td>
+                                <a th:href="@{/payments/add(emiId=${emi.emiId})}" class="btn btn-sm btn-success">Record Payment</a>
+                            </td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Two Column Layout: Recent Payments & Upcoming Due Dates -->
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(400px, 1fr)); gap: 24px;">
+                <!-- Recent Payments -->
+                <div class="card">
+                    <div class="card-title">
+                        <span>💵 Recent Payments</span>
+                        <a href="/payments" class="btn btn-sm btn-outline">View History</a>
+                    </div>
+                    <div class="table-responsive">
+                        <table class="custom-table">
+                            <thead>
+                            <tr>
+                                <th>Date</th>
+                                <th>Customer</th>
+                                <th>Amount</th>
+                                <th>Mode</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            <tr th:if="${recentPayments == null or #lists.isEmpty(recentPayments)}">
+                                <td colspan="4" style="text-align: center; color: var(--text-muted);">No payments recorded yet.</td>
+                            </tr>
+                            <tr th:each="p : ${recentPayments}">
+                                <td th:text="${p.paymentDate}">2026-08-10</td>
+                                <td th:text="${p.customer != null ? p.customer.name : 'N/A'}">Ramesh</td>
+                                <td th:text="${'₹' + #numbers.formatDecimal(p.amountPaid, 1, 'COMMA', 2, 'POINT')}" style="font-weight: 700; color: var(--success);">₹8,909</td>
+                                <td><span class="badge badge-info" th:text="${p.paymentMode}">Cash</span></td>
+                            </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- Upcoming EMIs -->
+                <div class="card">
+                    <div class="card-title">
+                        <span>📅 Upcoming Due Dates (Next 30 Days)</span>
+                        <a href="/emis" class="btn btn-sm btn-outline">Full Schedule</a>
+                    </div>
+                    <div class="table-responsive">
+                        <table class="custom-table">
+                            <thead>
+                            <tr>
+                                <th>Due Date</th>
+                                <th>Customer</th>
+                                <th>Bike</th>
+                                <th>Amount</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            <tr th:if="${upcomingEmis == null or #lists.isEmpty(upcomingEmis)}">
+                                <td colspan="4" style="text-align: center; color: var(--text-muted);">No upcoming EMIs in the next 30 days.</td>
+                            </tr>
+                            <tr th:each="u : ${upcomingEmis}">
+                                <td th:text="${u.dueDate}" style="font-weight: 700;">2026-09-10</td>
+                                <td th:text="${u.customer != null ? u.customer.name : 'N/A'}">Sathya Krishna</td>
+                                <td th:text="${u.bike != null ? u.bike.company + ' ' + u.bike.model : 'N/A'}">Pulsar 125</td>
+                                <td th:text="${'₹' + #numbers.formatDecimal(u.emiAmount, 1, 'COMMA', 2, 'POINT')}">₹8,909</td>
+                            </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+        </main>
+    </div>
+</div>
+
+</body>
+</html>

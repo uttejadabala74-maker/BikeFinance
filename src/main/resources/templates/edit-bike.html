@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Edit Bike - Sri Sai Teja Finance</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+</head>
+<body>
+
+<div class="app-container">
+    <aside class="sidebar" id="sidebar">
+        <div class="sidebar-header">
+            <div class="sidebar-brand-title">🏍️ Sri Sai Teja</div>
+            <div class="sidebar-brand-subtitle">Finance & Auto Consultancy</div>
+        </div>
+        <nav class="sidebar-nav">
+            <a href="/" class="nav-item"><span class="nav-icon">📊</span> Dashboard</a>
+            <a href="/bikes" class="nav-item active"><span class="nav-icon">🛵</span> Bikes Register</a>
+            <a href="/customers" class="nav-item"><span class="nav-icon">👥</span> Customers</a>
+            <a href="/finance" class="nav-item"><span class="nav-icon">💰</span> Finance Accounts</a>
+            <a href="/emis" class="nav-item"><span class="nav-icon">📅</span> EMI Schedule</a>
+            <a href="/payments" class="nav-item"><span class="nav-icon">💵</span> Payments</a>
+            <a href="/challans" class="nav-item"><span class="nav-icon">📜</span> Challans</a>
+            <a href="/reports" class="nav-item"><span class="nav-icon">📈</span> Reports</a>
+            <a href="/settings" class="nav-item"><span class="nav-icon">⚙️</span> Settings</a>
+        </nav>
+    </aside>
+
+    <div class="main-wrapper">
+        <header class="top-header">
+            <button class="mobile-toggle" onclick="document.getElementById('sidebar').classList.toggle('open')">☰</button>
+            <div class="header-actions">
+                <div class="business-badge"><span>🏢</span> Sri Sai Teja Finance</div>
+            </div>
+        </header>
+
+        <main class="content-area">
+            <div class="page-header">
+                <div>
+                    <h1 class="page-title">Edit Bike Details</h1>
+                    <p class="page-subtitle" th:text="${'Updating Bike #' + bike.bikeId}">Bike #1</p>
+                </div>
+                <a href="/bikes" class="btn btn-outline">⬅️ Back to Bikes</a>
+            </div>
+
+            <div class="card">
+                <form th:action="@{/bikes/update}" th:object="${bike}" method="post">
+                    <input type="hidden" th:field="*{bikeId}">
+                    
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label>Brand / Company *</label>
+                            <input type="text" th:field="*{company}" class="form-control" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Model *</label>
+                            <input type="text" th:field="*{model}" class="form-control" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Variant</label>
+                            <input type="text" th:field="*{variant}" class="form-control">
+                        </div>
+                        <div class="form-group">
+                            <label>Colour</label>
+                            <input type="text" th:field="*{colour}" class="form-control">
+                        </div>
+                        <div class="form-group">
+                            <label>Registration Number</label>
+                            <input type="text" th:field="*{registrationNumber}" class="form-control">
+                        </div>
+                        <div class="form-group">
+                            <label>Manufacturing Year</label>
+                            <input type="text" th:field="*{manufacturingYear}" class="form-control">
+                        </div>
+                        <div class="form-group">
+                            <label>Chassis Number</label>
+                            <input type="text" th:field="*{chassisNumber}" class="form-control">
+                        </div>
+                        <div class="form-group">
+                            <label>Engine Number</label>
+                            <input type="text" th:field="*{engineNumber}" class="form-control">
+                        </div>
+                        <div class="form-group">
+                            <label>Bike Actual Price (₹) *</label>
+                            <input type="number" step="0.01" th:field="*{bikeActualPrice}" class="form-control" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Assign Owner / Customer</label>
+                            <select name="customerId" class="form-control">
+                                <option value="">-- Unassigned --</option>
+                                <option th:each="c : ${customers}" th:value="${c.customerId}" th:text="${c.name + ' (' + c.phone + ')'}" th:selected="${bike.customer != null and bike.customer.customerId == c.customerId}"></option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>Status</label>
+                            <select th:field="*{status}" class="form-control">
+                                <option value="Available">Available</option>
+                                <option value="Sold">Sold</option>
+                                <option value="Financed">Financed</option>
+                                <option value="Completed">Completed</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div style="margin-top: 24px; display: flex; gap: 12px;">
+                        <button type="submit" class="btn btn-primary">💾 Update Bike</button>
+                        <a href="/bikes" class="btn btn-outline">Cancel</a>
+                    </div>
+                </form>
+            </div>
+        </main>
+    </div>
+</div>
+
+</body>
+</html>

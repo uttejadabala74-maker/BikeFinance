@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Global Search - Sri Sai Teja Finance</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+</head>
+<body>
+
+<div class="app-container">
+    <aside class="sidebar" id="sidebar">
+        <div class="sidebar-header">
+            <div class="sidebar-brand-title">🏍️ Sri Sai Teja</div>
+            <div class="sidebar-brand-subtitle">Finance & Auto Consultancy</div>
+        </div>
+        <nav class="sidebar-nav">
+            <a href="/" class="nav-item"><span class="nav-icon">📊</span> Dashboard</a>
+            <a href="/bikes" class="nav-item"><span class="nav-icon">🛵</span> Bikes Register</a>
+            <a href="/customers" class="nav-item"><span class="nav-icon">👥</span> Customers</a>
+            <a href="/finance" class="nav-item"><span class="nav-icon">💰</span> Finance Accounts</a>
+            <a href="/emis" class="nav-item"><span class="nav-icon">📅</span> EMI Schedule</a>
+            <a href="/payments" class="nav-item"><span class="nav-icon">💵</span> Payments</a>
+            <a href="/challans" class="nav-item"><span class="nav-icon">📜</span> Challans</a>
+            <a href="/reports" class="nav-item"><span class="nav-icon">📈</span> Reports</a>
+            <a href="/settings" class="nav-item"><span class="nav-icon">⚙️</span> Settings</a>
+        </nav>
+    </aside>
+
+    <div class="main-wrapper">
+        <header class="top-header">
+            <button class="mobile-toggle" onclick="document.getElementById('sidebar').classList.toggle('open')">☰</button>
+            <form action="/search" method="get" class="search-bar" style="width: 500px;">
+                <span>🔍</span>
+                <input type="text" name="q" th:value="${query}" placeholder="Search reg no, customer, phone, chassis, engine, loan #...">
+            </form>
+            <div class="header-actions">
+                <div class="business-badge"><span>🏢</span> Sri Sai Teja Finance</div>
+            </div>
+        </header>
+
+        <main class="content-area">
+            <div class="page-header">
+                <div>
+                    <h1 class="page-title">Global Search Results</h1>
+                    <p class="page-subtitle" th:text="${query != null and !query.isEmpty() ? 'Results matching: ' + query : 'Enter a search term to query records'}">Results</p>
+                </div>
+            </div>
+
+            <!-- Matching Customers -->
+            <div class="card" th:if="${matchingCustomers != null and !#lists.isEmpty(matchingCustomers)}">
+                <div class="card-title">👥 Matching Customers (<span th:text="${#lists.size(matchingCustomers)}">0</span>)</div>
+                <div class="table-responsive">
+                    <table class="custom-table">
+                        <thead>
+                        <tr>
+                            <th>Customer ID</th>
+                            <th>Name</th>
+                            <th>Phone</th>
+                            <th>Guardian</th>
+                            <th>Address</th>
+                            <th>Action</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <tr th:each="c : ${matchingCustomers}">
+                            <td th:text="${'#C-' + c.customerId}">#C-1</td>
+                            <td th:text="${c.name}" style="font-weight: 700;">Customer</td>
+                            <td th:text="${c.phone}">Phone</td>
+                            <td th:text="${c.guardianName}">Guardian</td>
+                            <td th:text="${c.address}">Address</td>
+                            <td>
+                                <a th:href="@{/customers/detail/{id}(id=${c.customerId})}" class="btn btn-sm btn-outline">View Customer Profile</a>
+                            </td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Matching Bikes -->
+            <div class="card" th:if="${matchingBikes != null and !#lists.isEmpty(matchingBikes)}">
+                <div class="card-title">🛵 Matching Vehicles / Bikes (<span th:text="${#lists.size(matchingBikes)}">0</span>)</div>
+                <div class="table-responsive">
+                    <table class="custom-table">
+                        <thead>
+                        <tr>
+                            <th>Bike ID</th>
+                            <th>Registration #</th>
+                            <th>Brand / Model</th>
+                            <th>Owner</th>
+                            <th>Status</th>
+                            <th>Action</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <tr th:each="b : ${matchingBikes}">
+                            <td th:text="${'#B-' + b.bikeId}">#B-1</td>
+                            <td th:text="${b.registrationNumber != null ? b.registrationNumber : 'UNREGISTERED'}" style="font-weight: 700;">AP 39 1234</td>
+                            <td th:text="${b.company + ' ' + b.model}">Honda Activa</td>
+                            <td th:text="${b.customer != null ? b.customer.name : 'Unassigned'}">Customer</td>
+                            <td><span class="badge badge-info" th:text="${b.status}">Financed</span></td>
+                            <td>
+                                <a th:href="@{/bikes/detail/{id}(id=${b.bikeId})}" class="btn btn-sm btn-outline">View Bike Details</a>
+                            </td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Matching Finance Accounts -->
+            <div class="card" th:if="${matchingFinance != null and !#lists.isEmpty(matchingFinance)}">
+                <div class="card-title">💰 Matching Finance Accounts (<span th:text="${#lists.size(matchingFinance)}">0</span>)</div>
+                <div class="table-responsive">
+                    <table class="custom-table">
+                        <thead>
+                        <tr>
+                            <th>Loan Acc #</th>
+                            <th>Finance Company</th>
+                            <th>Customer</th>
+                            <th>Bike</th>
+                            <th>Principal</th>
+                            <th>Outstanding</th>
+                            <th>Status</th>
+                            <th>Action</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <tr th:each="f : ${matchingFinance}">
+                            <td th:text="${f.loanAccountNumber}" style="font-weight: 700;">LON-1001</td>
+                            <td th:text="${f.financeCompany}">Sri Sai Teja Finance</td>
+                            <td th:text="${f.customer != null ? f.customer.name : 'N/A'}">Customer</td>
+                            <td th:text="${f.bike != null ? f.bike.registrationNumber : 'N/A'}">AP 39 1234</td>
+                            <td th:text="${'₹' + #numbers.formatDecimal(f.financePrincipal, 1, 'COMMA', 2, 'POINT')}">₹75,500</td>
+                            <td th:text="${'₹' + #numbers.formatDecimal(f.totalOutstanding, 1, 'COMMA', 2, 'POINT')}" style="color: var(--danger); font-weight: 800;">₹80,181</td>
+                            <td><span class="badge badge-success" th:text="${f.status}">Active</span></td>
+                            <td>
+                                <a th:href="@{/finance/detail/{id}(id=${f.financeId})}" class="btn btn-sm btn-outline">View Loan Account</a>
+                            </td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <div class="card" th:if="${(matchingCustomers == null or #lists.isEmpty(matchingCustomers)) and (matchingBikes == null or #lists.isEmpty(matchingBikes)) and (matchingFinance == null or #lists.isEmpty(matchingFinance))}">
+                <div style="text-align: center; padding: 40px; color: var(--text-muted);">
+                    <h2>🔍 No matching records found</h2>
+                    <p style="margin-top: 8px;">Try searching by registration number (e.g. AP 39), customer name, phone number, chassis or loan account number.</p>
+                </div>
+            </div>
+
+        </main>
+    </div>
+</div>
+
+</body>
+</html>

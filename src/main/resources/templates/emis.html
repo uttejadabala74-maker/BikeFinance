@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EMI Schedule - Sri Sai Teja Finance</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+</head>
+<body>
+
+<div class="app-container">
+    <aside class="sidebar" id="sidebar">
+        <div class="sidebar-header">
+            <div class="sidebar-brand-title">🏍️ Sri Sai Teja</div>
+            <div class="sidebar-brand-subtitle">Finance & Auto Consultancy</div>
+        </div>
+        <nav class="sidebar-nav">
+            <a href="/" class="nav-item"><span class="nav-icon">📊</span> Dashboard</a>
+            <a href="/bikes" class="nav-item"><span class="nav-icon">🛵</span> Bikes Register</a>
+            <a href="/customers" class="nav-item"><span class="nav-icon">👥</span> Customers</a>
+            <a href="/finance" class="nav-item"><span class="nav-icon">💰</span> Finance Accounts</a>
+            <a href="/emis" class="nav-item active"><span class="nav-icon">📅</span> EMI Schedule</a>
+            <a href="/payments" class="nav-item"><span class="nav-icon">💵</span> Payments</a>
+            <a href="/challans" class="nav-item"><span class="nav-icon">📜</span> Challans</a>
+            <a href="/reports" class="nav-item"><span class="nav-icon">📈</span> Reports</a>
+            <a href="/settings" class="nav-item"><span class="nav-icon">⚙️</span> Settings</a>
+        </nav>
+    </aside>
+
+    <div class="main-wrapper">
+        <header class="top-header">
+            <button class="mobile-toggle" onclick="document.getElementById('sidebar').classList.toggle('open')">☰</button>
+            <div class="header-actions">
+                <div class="business-badge"><span>🏢</span> Sri Sai Teja Finance</div>
+            </div>
+        </header>
+
+        <main class="content-area">
+            <div th:if="${successMessage}" class="alert alert-success" th:text="${successMessage}">Success!</div>
+            <div th:if="${errorMessage}" class="alert alert-danger" th:text="${errorMessage}">Error!</div>
+
+            <div class="page-header">
+                <div>
+                    <h1 class="page-title">EMI Schedule Directory</h1>
+                    <p class="page-subtitle">Track installment due dates, overdue statuses and payments</p>
+                </div>
+                <div style="display: flex; gap: 8px;">
+                    <a href="/emis" class="btn btn-sm btn-outline" th:classappend="${currentStatus == null ? 'btn-primary' : ''}">All EMIs</a>
+                    <a href="/emis?status=overdue" class="btn btn-sm btn-outline" th:classappend="${currentStatus == 'overdue' ? 'btn-danger' : ''}">⚠️ Overdue</a>
+                    <a href="/emis?status=Pending" class="btn btn-sm btn-outline" th:classappend="${currentStatus == 'Pending' ? 'btn-primary' : ''}">⏳ Pending</a>
+                    <a href="/emis?status=Paid" class="btn btn-sm btn-outline" th:classappend="${currentStatus == 'Paid' ? 'btn-success' : ''}">✅ Paid</a>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="table-responsive">
+                    <table class="custom-table">
+                        <thead>
+                        <tr>
+                            <th>EMI #</th>
+                            <th>Customer</th>
+                            <th>Phone</th>
+                            <th>Bike (Reg #)</th>
+                            <th>Loan Acc #</th>
+                            <th>Due Date</th>
+                            <th>EMI Amount</th>
+                            <th>Paid Amount</th>
+                            <th>Remaining</th>
+                            <th>Status</th>
+                            <th>Action</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <tr th:if="${emis == null or #lists.isEmpty(emis)}">
+                            <td colspan="11" style="text-align: center; color: var(--text-muted);">No EMI records found.</td>
+                        </tr>
+                        <tr th:each="e : ${emis}">
+                            <td th:text="${'EMI #' + e.emiNumber}">1</td>
+                            <td>
+                                <a th:if="${e.customer != null}" th:href="@{/customers/detail/{id}(id=${e.customer.customerId})}" th:text="${e.customer.name}" style="color: var(--brand-primary); font-weight: 700; text-decoration: none;">Sathya Krishna</a>
+                            </td>
+                            <td th:text="${e.customer != null ? e.customer.phone : 'N/A'}">9908149523</td>
+                            <td>
+                                <a th:if="${e.bike != null}" th:href="@{/bikes/detail/{id}(id=${e.bike.bikeId})}" th:text="${e.bike.registrationNumber != null ? e.bike.registrationNumber : e.bike.company + ' ' + e.bike.model}" style="color: var(--brand-primary); text-decoration: none;">AP 39 1234</a>
+                            </td>
+                            <td th:text="${e.financeAccount != null ? e.financeAccount.loanAccountNumber : 'N/A'}">LON-1001</td>
+                            <td th:text="${e.dueDate}" style="font-weight: 600;" th:styleappend="${e.status == 'Overdue' ? 'color: var(--danger); font-weight: 800;' : ''}">2026-09-10</td>
+                            <td th:text="${'₹' + #numbers.formatDecimal(e.emiAmount, 1, 'COMMA', 2, 'POINT')}">₹8,909</td>
+                            <td th:text="${'₹' + #numbers.formatDecimal(e.paidAmount, 1, 'COMMA', 2, 'POINT')}">₹0.00</td>
+                            <td th:text="${'₹' + #numbers.formatDecimal(e.remainingAmount, 1, 'COMMA', 2, 'POINT')}">₹8,909</td>
+                            <td>
+                                <span class="badge" th:classappend="${e.status == 'Paid' ? 'badge-success' : (e.status == 'Overdue' ? 'badge-danger' : (e.status == 'Partially Paid' ? 'badge-warning' : 'badge-secondary'))}" th:text="${e.status}">Pending</span>
+                            </td>
+                            <td>
+                                <a th:if="${e.status != 'Paid'}" th:href="@{/payments/add(emiId=${e.emiId})}" class="btn btn-sm btn-success">💵 Pay EMI</a>
+                            </td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </main>
+    </div>
+</div>
+
+</body>
+</html>

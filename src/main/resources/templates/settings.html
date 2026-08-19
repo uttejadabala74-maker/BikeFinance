@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Settings - Sri Sai Teja Finance</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+</head>
+<body>
+
+<div class="app-container">
+    <aside class="sidebar" id="sidebar">
+        <div class="sidebar-header">
+            <div class="sidebar-brand-title">🏍️ Sri Sai Teja</div>
+            <div class="sidebar-brand-subtitle">Finance & Auto Consultancy</div>
+        </div>
+        <nav class="sidebar-nav">
+            <a href="/" class="nav-item"><span class="nav-icon">📊</span> Dashboard</a>
+            <a href="/bikes" class="nav-item"><span class="nav-icon">🛵</span> Bikes Register</a>
+            <a href="/customers" class="nav-item"><span class="nav-icon">👥</span> Customers</a>
+            <a href="/finance" class="nav-item"><span class="nav-icon">💰</span> Finance Accounts</a>
+            <a href="/emis" class="nav-item"><span class="nav-icon">📅</span> EMI Schedule</a>
+            <a href="/payments" class="nav-item"><span class="nav-icon">💵</span> Payments</a>
+            <a href="/challans" class="nav-item"><span class="nav-icon">📜</span> Challans</a>
+            <a href="/reports" class="nav-item"><span class="nav-icon">📈</span> Reports</a>
+            <a href="/settings" class="nav-item active"><span class="nav-icon">⚙️</span> Settings</a>
+        </nav>
+    </aside>
+
+    <div class="main-wrapper">
+        <header class="top-header">
+            <button class="mobile-toggle" onclick="document.getElementById('sidebar').classList.toggle('open')">☰</button>
+            <div class="header-actions">
+                <div class="business-badge"><span>🏢</span> Sri Sai Teja Finance</div>
+            </div>
+        </header>
+
+        <main class="content-area">
+            <div class="page-header">
+                <div>
+                    <h1 class="page-title">Business & Application Settings</h1>
+                    <p class="page-subtitle">Configure business profile & default finance calculation settings</p>
+                </div>
+            </div>
+
+            <div class="card" style="max-width: 800px;">
+                <div class="card-title">🏢 Business Information</div>
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label>Business Name</label>
+                        <input type="text" class="form-control" value="Sri Sai Teja Finance and Auto Consultancy" readonly style="background-color: #f1f5f9; font-weight: 700;">
+                    </div>
+                    <div class="form-group">
+                        <label>Default Finance Partner</label>
+                        <input type="text" class="form-control" value="Sri Sai Teja Finance (In-House)">
+                    </div>
+                    <div class="form-group">
+                        <label>Default Monthly Interest Rate (%)</label>
+                        <input type="text" class="form-control" value="1.8%">
+                    </div>
+                    <div class="form-group">
+                        <label>Default Interest Type</label>
+                        <input type="text" class="form-control" value="Flat / Simple Interest" readonly style="background-color: #f1f5f9;">
+                    </div>
+                    <div class="form-group">
+                        <label>Database Engine</label>
+                        <input type="text" class="form-control" value="MySQL (bikefinance on localhost:3306)" readonly style="background-color: #f1f5f9;">
+                    </div>
+                    <div class="form-group">
+                        <label>Database Schema Status</label>
+                        <input type="text" class="form-control" value="Preserved & Dynamic" readonly style="background-color: #f0fdf4; color: #166534; font-weight: 700;">
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+</div>
+
+</body>
+</html>

@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Customer Profile - Sri Sai Teja Finance</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+</head>
+<body>
+
+<div class="app-container">
+    <aside class="sidebar" id="sidebar">
+        <div class="sidebar-header">
+            <div class="sidebar-brand-title">🏍️ Sri Sai Teja</div>
+            <div class="sidebar-brand-subtitle">Finance & Auto Consultancy</div>
+        </div>
+        <nav class="sidebar-nav">
+            <a href="/" class="nav-item"><span class="nav-icon">📊</span> Dashboard</a>
+            <a href="/bikes" class="nav-item"><span class="nav-icon">🛵</span> Bikes Register</a>
+            <a href="/customers" class="nav-item active"><span class="nav-icon">👥</span> Customers</a>
+            <a href="/finance" class="nav-item"><span class="nav-icon">💰</span> Finance Accounts</a>
+            <a href="/emis" class="nav-item"><span class="nav-icon">📅</span> EMI Schedule</a>
+            <a href="/payments" class="nav-item"><span class="nav-icon">💵</span> Payments</a>
+            <a href="/challans" class="nav-item"><span class="nav-icon">📜</span> Challans</a>
+            <a href="/reports" class="nav-item"><span class="nav-icon">📈</span> Reports</a>
+            <a href="/settings" class="nav-item"><span class="nav-icon">⚙️</span> Settings</a>
+        </nav>
+    </aside>
+
+    <div class="main-wrapper">
+        <header class="top-header">
+            <button class="mobile-toggle" onclick="document.getElementById('sidebar').classList.toggle('open')">☰</button>
+            <div class="header-actions">
+                <div class="business-badge"><span>🏢</span> Sri Sai Teja Finance</div>
+            </div>
+        </header>
+
+        <main class="content-area">
+            <div class="page-header">
+                <div>
+                    <h1 class="page-title" th:text="${customer.name}">Dokka Sathya Krishna</h1>
+                    <p class="page-subtitle" th:text="${'Customer ID: #C-' + customer.customerId}">Customer ID: #C-1</p>
+                </div>
+                <div style="display: flex; gap: 10px;">
+                    <a th:href="@{/customers/edit/{id}(id=${customer.customerId})}" class="btn btn-outline">✏️ Edit Customer Profile</a>
+                    <a th:href="@{/finance/add(customerId=${customer.customerId})}" class="btn btn-primary">➕ New Finance Account</a>
+                </div>
+            </div>
+
+            <!-- Customer Details Card -->
+            <div class="card">
+                <div class="card-title">👤 Customer Contact & Identification</div>
+                <div class="form-grid" style="grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));">
+                    <div><strong>Full Name:</strong> <span th:text="${customer.name}" style="font-weight: 700;">Sathya Krishna</span></div>
+                    <div><strong>Phone:</strong> <span th:text="${customer.phone}" style="font-weight: 700; color: var(--brand-primary);">9908149523</span></div>
+                    <div><strong>Alt Phone:</strong> <span th:text="${customer.alternatePhone != null ? customer.alternatePhone : 'N/A'}">N/A</span></div>
+                    <div><strong>Guardian Name:</strong> <span th:text="${customer.guardianName != null ? customer.guardianName : 'N/A'}">Guardian</span></div>
+                    <div><strong>Village / City:</strong> <span th:text="${customer.cityVillage != null ? customer.cityVillage : 'N/A'}">Rusthumbhadh</span></div>
+                    <div><strong>District:</strong> <span th:text="${customer.district != null ? customer.district : 'N/A'}">West Godavari</span></div>
+                    <div><strong>Address:</strong> <span th:text="${customer.address}">Rusthumbhadh</span></div>
+                    <div><strong>ID Proof:</strong> <span th:text="${customer.idProofDetails != null ? customer.idProofDetails : 'N/A'}">Aadhaar #</span></div>
+                </div>
+            </div>
+
+            <!-- Associated Bikes -->
+            <div class="card">
+                <div class="card-title">🛵 Connected Bikes (<span th:text="${#lists.size(bikes)}">0</span>)</div>
+                <div class="table-responsive">
+                    <table class="custom-table">
+                        <thead>
+                        <tr>
+                            <th>Bike Reg #</th>
+                            <th>Brand / Model</th>
+                            <th>Actual Price</th>
+                            <th>Status</th>
+                            <th>Actions</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <tr th:if="${bikes == null or #lists.isEmpty(bikes)}">
+                            <td colspan="5" style="text-align: center; color: var(--text-muted);">No bikes associated with this customer.</td>
+                        </tr>
+                        <tr th:each="b : ${bikes}">
+                            <td th:text="${b.registrationNumber != null ? b.registrationNumber : 'UNREGISTERED'}" style="font-weight: 700;">AP 39 1234</td>
+                            <td th:text="${b.company + ' ' + b.model}">Pulsar 125</td>
+                            <td th:text="${'₹' + #numbers.formatDecimal(b.bikeActualPrice, 1, 'COMMA', 2, 'POINT')}">₹75,000</td>
+                            <td><span class="badge badge-info" th:text="${b.status}">Financed</span></td>
+                            <td>
+                                <a th:href="@{/bikes/detail/{id}(id=${b.bikeId})}" class="btn btn-sm btn-outline">👁️ View Bike</a>
+                            </td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Finance Accounts -->
+            <div class="card">
+                <div class="card-title">💰 Finance Accounts (<span th:text="${#lists.size(financeAccounts)}">0</span>)</div>
+                <div class="table-responsive">
+                    <table class="custom-table">
+                        <thead>
+                        <tr>
+                            <th>Loan Acc #</th>
+                            <th>Company</th>
+                            <th>Principal</th>
+                            <th>EMI Amount</th>
+                            <th>Total Paid</th>
+                            <th>Outstanding</th>
+                            <th>Status</th>
+                            <th>Action</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <tr th:if="${financeAccounts == null or #lists.isEmpty(financeAccounts)}">
+                            <td colspan="8" style="text-align: center; color: var(--text-muted);">No finance accounts found for this customer.</td>
+                        </tr>
+                        <tr th:each="f : ${financeAccounts}">
+                            <td th:text="${f.loanAccountNumber}" style="font-weight: 700;">LON-1001</td>
+                            <td th:text="${f.financeCompany}">Sri Sai Teja Finance</td>
+                            <td th:text="${'₹' + #numbers.formatDecimal(f.financePrincipal, 1, 'COMMA', 2, 'POINT')}">₹75,500</td>
+                            <td th:text="${'₹' + #numbers.formatDecimal(f.emiAmount, 1, 'COMMA', 2, 'POINT')}">₹8,909</td>
+                            <td th:text="${'₹' + #numbers.formatDecimal(f.totalPaid, 1, 'COMMA', 2, 'POINT')}" style="color: var(--success); font-weight: 700;">₹8,909</td>
+                            <td th:text="${'₹' + #numbers.formatDecimal(f.totalOutstanding, 1, 'COMMA', 2, 'POINT')}" style="color: var(--danger); font-weight: 800;">₹80,181</td>
+                            <td><span class="badge badge-success" th:text="${f.status}">Active</span></td>
+                            <td>
+                                <a th:href="@{/finance/detail/{id}(id=${f.financeId})}" class="btn btn-sm btn-outline">👁️ View Loan</a>
+                            </td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+        </main>
+    </div>
+</div>
+
+</body>
+</html>
