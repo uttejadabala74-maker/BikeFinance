@@ -38,6 +38,9 @@ public class MainActivity extends Activity {
 
         preferences = getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE);
         currentServerUrl = preferences.getString(KEY_SERVER_URL, DEFAULT_URL);
+        if (currentServerUrl != null) {
+            currentServerUrl = currentServerUrl.replace(',', '.');
+        }
 
         webView = findViewById(R.id.webview);
         errorLayout = findViewById(R.id.error_layout);
