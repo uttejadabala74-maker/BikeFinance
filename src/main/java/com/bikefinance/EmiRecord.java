@@ -37,7 +37,7 @@ public class EmiRecord {
     private Double paidAmount = 0.0;
 
     @Column(name = "remaining_amount")
-    private Double remainingAmount = 0.0;
+    private Double remainingAmount;
 
     @Column(name = "status")
     private String status = "Pending"; // Pending, Paid, Partially Paid, Overdue, Waived, Cancelled
