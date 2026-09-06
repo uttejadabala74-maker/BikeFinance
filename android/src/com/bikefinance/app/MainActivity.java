@@ -24,7 +24,7 @@ public class MainActivity extends Activity {
 
     private static final String PREFS_NAME = "BikeFinancePrefs";
     private static final String KEY_SERVER_URL = "server_url";
-    private static final String DEFAULT_URL = "http://10.0.2.2:8080"; // Default local server / emulator IP
+    private static final String DEFAULT_URL = "http://192.168.10.76:8080"; // Local computer Wi-Fi IP
 
     private WebView webView;
     private LinearLayout errorLayout;
@@ -90,6 +90,9 @@ public class MainActivity extends Activity {
         webSettings.setBuiltInZoomControls(true);
         webSettings.setDisplayZoomControls(false);
         webSettings.setAllowFileAccess(true);
+        webSettings.setAllowContentAccess(true);
+        webSettings.setJavaScriptCanOpenWindowsAutomatically(true);
+        webSettings.setMixedContentMode(WebSettings.MIXED_CONTENT_ALWAYS_ALLOW);
 
         webView.setWebChromeClient(new WebChromeClient());
         webView.setWebViewClient(new WebViewClient() {
@@ -125,7 +128,7 @@ public class MainActivity extends Activity {
     private void reloadWebView() {
         errorLayout.setVisibility(View.GONE);
         webView.setVisibility(View.VISIBLE);
-        webView.reload();
+        webView.loadUrl(currentServerUrl);
     }
 
     private void showServerUrlDialog() {
@@ -148,6 +151,16 @@ public class MainActivity extends Activity {
                 currentServerUrl = newUrl;
                 preferences.edit().putString(KEY_SERVER_URL, currentServerUrl).apply();
                 Toast.makeText(MainActivity.this, "URL Saved: " + currentServerUrl, Toast.LENGTH_SHORT).show();
+                loadServerUrl();
+            }
+        });
+
+        builder.setNeutralButton("Use Local Wi-Fi", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                currentServerUrl = "http://192.168.10.76:8080";
+                preferences.edit().putString(KEY_SERVER_URL, currentServerUrl).apply();
+                Toast.makeText(MainActivity.this, "URL set to Wi-Fi IP: " + currentServerUrl, Toast.LENGTH_SHORT).show();
                 loadServerUrl();
             }
         });
