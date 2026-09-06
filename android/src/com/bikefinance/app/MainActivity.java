@@ -24,7 +24,7 @@ public class MainActivity extends Activity {
 
     private static final String PREFS_NAME = "BikeFinancePrefs";
     private static final String KEY_SERVER_URL = "server_url";
-    private static final String DEFAULT_URL = "http://192.168.10.76:8080"; // Local computer Wi-Fi IP
+    private static final String DEFAULT_URL = "https://bike-finance-app.vercel.app"; // Default Deployed Vercel URL
 
     private WebView webView;
     private LinearLayout errorLayout;
@@ -125,6 +125,7 @@ public class MainActivity extends Activity {
         if (currentServerUrl == null || currentServerUrl.trim().isEmpty()) {
             currentServerUrl = DEFAULT_URL;
         }
+        currentServerUrl = currentServerUrl.replace(',', '.');
         webView.loadUrl(currentServerUrl);
     }
 
@@ -136,35 +137,35 @@ public class MainActivity extends Activity {
 
     private void showServerUrlDialog() {
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        builder.setTitle(R.string.server_dialog_title);
-        builder.setMessage(R.string.server_dialog_message);
+        builder.setTitle("Deployed Web App URL");
+        builder.setMessage("Enter your live Vercel / Render deployed website URL:");
 
         final EditText input = new EditText(this);
         input.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_URI);
         input.setText(currentServerUrl);
         builder.setView(input);
 
-        builder.setPositiveButton(R.string.save, new DialogInterface.OnClickListener() {
+        builder.setPositiveButton("Save & Load Website", new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
                 String newUrl = input.getText().toString().trim();
                 newUrl = newUrl.replace(',', '.');
                 if (!newUrl.startsWith("http://") && !newUrl.startsWith("https://")) {
-                    newUrl = "http://" + newUrl;
+                    newUrl = "https://" + newUrl;
                 }
                 currentServerUrl = newUrl;
                 preferences.edit().putString(KEY_SERVER_URL, currentServerUrl).apply();
-                Toast.makeText(MainActivity.this, "URL Saved: " + currentServerUrl, Toast.LENGTH_SHORT).show();
+                Toast.makeText(MainActivity.this, "Website URL Saved: " + currentServerUrl, Toast.LENGTH_SHORT).show();
                 loadServerUrl();
             }
         });
 
-        builder.setNeutralButton("Use Local Wi-Fi", new DialogInterface.OnClickListener() {
+        builder.setNeutralButton("Use Vercel App", new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
-                currentServerUrl = "http://192.168.10.76:8080";
+                currentServerUrl = "https://bike-finance-app.vercel.app";
                 preferences.edit().putString(KEY_SERVER_URL, currentServerUrl).apply();
-                Toast.makeText(MainActivity.this, "URL set to Wi-Fi IP: " + currentServerUrl, Toast.LENGTH_SHORT).show();
+                Toast.makeText(MainActivity.this, "Connected to Vercel App!", Toast.LENGTH_SHORT).show();
                 loadServerUrl();
             }
         });
